@@ -7,6 +7,7 @@ import EmissionItem from "./components/EmissionItem";
 import { AppIcons } from "./components/icons";
 import { suggestAntidotes, generateAffirmation } from "./geminiService";
 import { playStartSound, playEndSound, initializeAudioContext, isAudioAvailable } from "./audioUtils";
+import { getActivatingBeliefsForFlower, hasActivatingBeliefs } from "./activatingBeliefs";
 
 export const App: React.FC = () => {
     const C = appConfig.colors;
@@ -478,6 +479,31 @@ export const App: React.FC = () => {
                         className={`w-full p-2 rounded bg-gray-700 border border-gray-600 ${C.text} focus:ring-1 focus:ring-${C.accent} focus:border-${C.accent} text-base`}
                         rows={3}
                     />
+                    
+                    {/* Creencias Activadoras Predefinidas */}
+                    {selectedFlower && hasActivatingBeliefs(selectedFlower.name) && (
+                        <div className="space-y-2">
+                            <p className={`text-sm font-medium ${C.accent} flex items-center gap-1`}>
+                                <AppIcons.Flower2Icon className="w-4 h-4" />
+                                Creencias Activadoras para {selectedFlower.name}:
+                            </p>
+                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                                {getActivatingBeliefsForFlower(selectedFlower.name).map((belief, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => { 
+                                            setAntidoteInput(belief); 
+                                            logEvent(`Creencia activadora predefinida seleccionada: "${belief}"`);
+                                        }}
+                                        className={`w-full text-left p-2 text-sm rounded bg-${C.accent}/10 hover:bg-${C.accent}/20 ${C.text} transition-colors border border-${C.accent}/30`}
+                                    >
+                                        <span className={`text-xs ${C.textSecondary}`}>{idx + 1}.</span> {belief}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <button
                         onClick={handleSuggestAntidotesAI}
                         disabled={isSuggestingAntidotes}
@@ -492,7 +518,7 @@ export const App: React.FC = () => {
                             {suggestedAntidotes.map((sugg, idx) => (
                                 <button
                                     key={idx}
-                                    onClick={() => { setAntidoteInput(sugg); logEvent(`Antídoto sugerido seleccionado: "${sugg}"`);}}
+                                    onClick={() => { setAntidoteInput(sugg); logEvent(`Antídoto sugerido por IA seleccionado: "${sugg}"`);}}
                                     className={`w-full text-left p-2 text-sm rounded bg-gray-600/50 hover:bg-${C.accent}/30 ${C.text} transition-colors`}
                                 >
                                     {sugg}
@@ -670,7 +696,7 @@ export const App: React.FC = () => {
                                             }}
                                         >
                                             <path
-                                                d="M12 2C8 2 6 6 6 8s2 6 6 6 6-4 6-6-2-6-6-6zm0 0C16 2 18 6 18 8s-2 6-6 6-6-4-6-6 2-6 6-6z"
+                                                d="M6 8c0-2.5 2-4.5 4.5-4.5S15 5.5 15 8s-2 4.5-4.5 4.5S6 10.5 6 8zm7.5 0c0 2.5 2 4.5 4.5 4.5s4.5-2 4.5-4.5-2-4.5-4.5-4.5-4.5 2-4.5 4.5z"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 strokeWidth="1.5"
@@ -741,7 +767,7 @@ export const App: React.FC = () => {
                                             }}
                                         >
                                             <path
-                                                d="M12 2C8 2 6 6 6 8s2 6 6 6 6-4 6-6-2-6-6-6zm0 0C16 2 18 6 18 8s-2 6-6 6-6-4-6-6 2-6 6-6z"
+                                                d="M6 8c0-2.5 2-4.5 4.5-4.5S15 5.5 15 8s-2 4.5-4.5 4.5S6 10.5 6 8zm7.5 0c0 2.5 2 4.5 4.5 4.5s4.5-2 4.5-4.5-2-4.5-4.5-4.5-4.5 2-4.5 4.5z"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 strokeWidth="1.5"
