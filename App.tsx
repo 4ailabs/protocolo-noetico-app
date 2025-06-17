@@ -377,6 +377,222 @@ export const App: React.FC = () => {
         setSessionLog("");
     };
 
+    const generateSessionData = () => {
+        const sessionData = {
+            metadata: {
+                exportDate: new Date().toISOString(),
+                sessionDate: currentDateTime.toISOString(),
+                subject: {
+                    name: subjectName || 'No especificado',
+                    dateOfBirth: subjectDOB || 'No especificada',
+                    cri: subjectCRI || 'No especificado'
+                },
+                duration: timerDisplay,
+                status: isBroadcasting ? 'En transmisión' : 'Detenida'
+            },
+            emissionPanel: emissionPanelItems.map(item => {
+                if (item.type === 'noetic_formula') {
+                    return {
+                        type: 'Fórmula Noética',
+                        id: item.id,
+                        flower: item.data.flower ? {
+                            name: item.data.flower.name,
+                            rate: item.data.flower.rate
+                        } : null,
+                        neutralize: item.data.neutralize,
+                        activate: item.data.activate,
+                        affirmation: item.data.affirmation || null
+                    };
+                } else {
+                    return {
+                        type: 'Tasa Simple',
+                        id: item.id,
+                        name: item.data.name,
+                        rate: item.data.rate
+                    };
+                }
+            }),
+            sessionLog: sessionLog,
+            settings: {
+                timerDuration: timerInput + ' minutos'
+            }
+        };
+        return sessionData;
+    };
+
+    const exportAsJSON = () => {
+        const sessionData = generateSessionData();
+        const dataStr = JSON.stringify(sessionData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `sesion-protocolo-noetico-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        logEvent("Sesión exportada como JSON");
+    };
+
+    const exportAsText = () => {
+        const sessionData = generateSessionData();
+        let textContent = `PROTOCOLO NOÉTICO - REPORTE DE SESIÓN\n`;
+        textContent += `${'='.repeat(50)}\n\n`;
+        
+        textContent += `INFORMACIÓN DE LA SESIÓN:\n`;
+        textContent += `Fecha de exportación: ${new Date().toLocaleString('es-ES')}\n`;
+        textContent += `Fecha de sesión: ${currentDateTime.toLocaleString('es-ES')}\n`;
+        textContent += `Duración configurada: ${sessionData.settings.timerDuration}\n`;
+        textContent += `Estado: ${sessionData.metadata.status}\n\n`;
+        
+        textContent += `INFORMACIÓN DEL SUJETO:\n`;
+        textContent += `Nombre: ${sessionData.metadata.subject.name}\n`;
+        textContent += `Fecha de nacimiento: ${sessionData.metadata.subject.dateOfBirth}\n`;
+        textContent += `C.R.I.: ${sessionData.metadata.subject.cri}\n\n`;
+        
+        textContent += `PANEL DE EMISIÓN:\n`;
+        if (sessionData.emissionPanel.length === 0) {
+            textContent += `(Sin elementos en el panel)\n\n`;
+        } else {
+            sessionData.emissionPanel.forEach((item, index) => {
+                textContent += `${index + 1}. ${item.type}\n`;
+                if (item.type === 'Fórmula Noética') {
+                    if (item.flower) {
+                        textContent += `   Flor: ${item.flower.name} (Tasa: ${item.flower.rate})\n`;
+                    } else {
+                        textContent += `   Flor: Sin flor asociada (Otros)\n`;
+                    }
+                    textContent += `   Neutralizar: "${item.neutralize}"\n`;
+                    textContent += `   Activar: "${item.activate}"\n`;
+                    if (item.affirmation) {
+                        textContent += `   Afirmación: "${item.affirmation}"\n`;
+                    }
+                } else {
+                    textContent += `   Nombre: ${item.name}\n`;
+                    textContent += `   Tasa: ${item.rate}\n`;
+                }
+                textContent += `\n`;
+            });
+        }
+        
+        textContent += `REGISTRO DE SESIÓN:\n`;
+        textContent += `${'-'.repeat(30)}\n`;
+        textContent += sessionData.sessionLog || '(Sin eventos registrados)';
+        
+        const dataBlob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `sesion-protocolo-noetico-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        logEvent("Sesión exportada como archivo de texto");
+    };
+
+    const exportAsPDF = () => {
+        const sessionData = generateSessionData();
+        
+        // Crear contenido HTML para el PDF
+        let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Protocolo Noético - Reporte de Sesión</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+                .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+                .section { margin-bottom: 25px; }
+                .section-title { font-size: 18px; font-weight: bold; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px; }
+                .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+                .info-item { margin-bottom: 8px; }
+                .label { font-weight: bold; color: #555; }
+                .emission-item { background: #f9f9f9; padding: 15px; margin-bottom: 10px; border-left: 4px solid #6366f1; }
+                .log-content { background: #f5f5f5; padding: 15px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+                .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 12px; color: #666; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>PROTOCOLO NOÉTICO</h1>
+                <h2>Reporte de Sesión</h2>
+                <p>Generado el ${new Date().toLocaleString('es-ES')}</p>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Información de la Sesión</div>
+                <div class="info-grid">
+                    <div class="info-item"><span class="label">Fecha de sesión:</span> ${currentDateTime.toLocaleString('es-ES')}</div>
+                    <div class="info-item"><span class="label">Duración configurada:</span> ${sessionData.settings.timerDuration}</div>
+                    <div class="info-item"><span class="label">Estado:</span> ${sessionData.metadata.status}</div>
+                    <div class="info-item"><span class="label">Temporizador:</span> ${timerDisplay}</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Información del Sujeto</div>
+                <div class="info-item"><span class="label">Nombre:</span> ${sessionData.metadata.subject.name}</div>
+                <div class="info-item"><span class="label">Fecha de nacimiento:</span> ${sessionData.metadata.subject.dateOfBirth}</div>
+                <div class="info-item"><span class="label">C.R.I.:</span> ${sessionData.metadata.subject.cri}</div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Panel de Emisión</div>
+                ${sessionData.emissionPanel.length === 0 ? 
+                    '<p><em>Sin elementos en el panel</em></p>' : 
+                    sessionData.emissionPanel.map((item, index) => `
+                        <div class="emission-item">
+                            <h4>${index + 1}. ${item.type}</h4>
+                            ${item.type === 'Fórmula Noética' ? `
+                                <p><span class="label">Flor:</span> ${item.flower ? `${item.flower.name} (Tasa: ${item.flower.rate})` : 'Sin flor asociada (Otros)'}</p>
+                                <p><span class="label">Neutralizar:</span> "${item.neutralize}"</p>
+                                <p><span class="label">Activar:</span> "${item.activate}"</p>
+                                ${item.affirmation ? `<p><span class="label">Afirmación:</span> "${item.affirmation}"</p>` : ''}
+                            ` : `
+                                <p><span class="label">Nombre:</span> ${item.name}</p>
+                                <p><span class="label">Tasa:</span> ${item.rate}</p>
+                            `}
+                        </div>
+                    `).join('')
+                }
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Registro de Sesión</div>
+                <div class="log-content">${sessionData.sessionLog || '(Sin eventos registrados)'}</div>
+            </div>
+            
+            <div class="footer">
+                <p>&copy; ${new Date().getFullYear()} ${appConfig.author} - Herramienta de Protocolo Noético Nivel 2</p>
+            </div>
+        </body>
+        </html>
+        `;
+        
+        // Crear ventana para imprimir
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.focus();
+            
+            // Esperar a que se cargue y luego imprimir
+            printWindow.onload = () => {
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 500);
+            };
+            
+            logEvent("Sesión exportada como PDF (función de impresión del navegador)");
+        } else {
+            alert("No se pudo abrir la ventana de impresión. Por favor, permita ventanas emergentes.");
+        }
+    };
+
     const wizardSteps = [
         {
             title: "Paso 1: Seleccionar Grupo",
@@ -900,12 +1116,42 @@ export const App: React.FC = () => {
                             <AppIcons.DocumentIcon className="w-6 h-6" />
                             Registro de Sesión
                         </h2>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={handleClearSessionLog}
+                                className={`text-sm ${C.textSecondary} hover:text-red-400 transition-colors p-1`}
+                                title="Limpiar registro"
+                            >
+                                <AppIcons.XCircleIcon className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {/* Botones de Exportación */}
+                    <div className="flex flex-wrap gap-2 mb-4">
                         <button
-                            onClick={handleClearSessionLog}
-                            className={`text-sm ${C.textSecondary} hover:text-red-400 transition-colors p-1`}
-                            title="Limpiar registro"
+                            onClick={exportAsJSON}
+                            className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors`}
+                            title="Exportar como JSON"
                         >
-                            <AppIcons.XCircleIcon className="w-4 h-4" />
+                            <AppIcons.DocumentIcon className="w-3 h-3" />
+                            JSON
+                        </button>
+                        <button
+                            onClick={exportAsText}
+                            className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors`}
+                            title="Exportar como texto"
+                        >
+                            <AppIcons.FileTextIcon className="w-3 h-3" />
+                            TXT
+                        </button>
+                        <button
+                            onClick={exportAsPDF}
+                            className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors`}
+                            title="Exportar como PDF"
+                        >
+                            <AppIcons.DocumentIcon className="w-3 h-3" />
+                            PDF
                         </button>
                     </div>
                     <textarea
