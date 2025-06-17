@@ -39,7 +39,7 @@ const EmissionItem: React.FC<EmissionItemProps> = ({
                         </p>
                     ) : (
                         <p className={`font-semibold text-base text-${C.accent} flex items-center`}>
-                            <AppIcons.Wand2Icon className={`w-5 h-5 mr-2 text-${C.accent}`} />
+                            <AppIcons.ConsciousnessIcon className={`w-5 h-5 mr-2 text-${C.accent}`} />
                             Reprogramación de Creencia (Otros)
                         </p>
                     )}
@@ -52,16 +52,19 @@ const EmissionItem: React.FC<EmissionItemProps> = ({
                     </button>
                 </div>
                 <div className="pl-7 space-y-1.5">
-                    <p className="text-sm text-red-400">
-                        <strong>Neutralizar:</strong> "{formulaData.neutralize}"
+                    <p className="text-sm text-red-400 flex items-start gap-2">
+                        <AppIcons.NoSymbolIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span><strong>Neutralizar:</strong> "{formulaData.neutralize}"</span>
                     </p>
-                    <p className="text-sm text-green-400">
-                        <strong>Activar:</strong> "{formulaData.activate}"
+                    <p className="text-sm text-green-400 flex items-start gap-2">
+                        <AppIcons.CheckCircleIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span><strong>Activar:</strong> "{formulaData.activate}"</span>
                     </p>
                     
                     {formulaData.affirmation && (
-                         <p className={`text-sm text-${C.secondaryAccent} italic mt-2`}>
-                            <strong>Afirmación:</strong> "{formulaData.affirmation}"
+                         <p className={`text-sm text-${C.secondaryAccent} italic mt-2 flex items-start gap-2`}>
+                            <AppIcons.LightBulbIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                            <span><strong>Afirmación:</strong> "{formulaData.affirmation}"</span>
                         </p>
                     )}
 

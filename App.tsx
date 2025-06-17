@@ -522,14 +522,16 @@ export const App: React.FC = () => {
                         <div className="flex border-b border-gray-700 mb-4">
                             <button 
                                 onClick={() => { setActiveTab("beliefs"); if(isWizardOpen && currentStep === 0) goToStep(1);}}
-                                className={`py-2.5 px-4 text-base ${activeTab === "beliefs" ? `border-b-2 border-${C.accent} text-${C.accent}` : `${C.textSecondary} hover:text-gray-100`}`}
+                                className={`py-2.5 px-4 text-base flex items-center gap-2 ${activeTab === "beliefs" ? `border-b-2 border-${C.accent} text-${C.accent}` : `${C.textSecondary} hover:text-gray-100`}`}
                             >
+                                <AppIcons.BeakerIcon className="w-4 h-4" />
                                 Protocolo Noético
                             </button>
                             <button 
                                 onClick={() => setActiveTab("flowers")}
-                                className={`py-2.5 px-4 text-base ${activeTab === "flowers" ? `border-b-2 border-${C.accent} text-${C.accent}` : `${C.textSecondary} hover:text-gray-100`}`}
+                                className={`py-2.5 px-4 text-base flex items-center gap-2 ${activeTab === "flowers" ? `border-b-2 border-${C.accent} text-${C.accent}` : `${C.textSecondary} hover:text-gray-100`}`}
                             >
+                                <AppIcons.Flower2Icon className="w-4 h-4" />
                                 Añadir Flores/Tasas
                             </button>
                         </div>
@@ -540,7 +542,7 @@ export const App: React.FC = () => {
                                     onClick={handleToggleWizard}
                                     className={`w-full mb-4 py-2.5 px-4 rounded-md text-white bg-gradient-to-r ${C.accentGradientFrom} ${C.accentGradientTo} hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-base`}
                                 >
-                                    <AppIcons.Edit3Icon className="w-5 h-5" />
+                                    <AppIcons.ConsciousnessIcon className="w-5 h-5" />
                                     {isWizardOpen ? "Cerrar Asistente de Protocolo" : "Iniciar Asistente de Protocolo"}
                                 </button>
                                 <AnimatePresence>
@@ -610,7 +612,10 @@ export const App: React.FC = () => {
                 {/* Center Panel: Emission Panel & Controls */}
                 <section className="lg:col-span-1 space-y-6">
                     <div className={`bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-${C.accent}/20`}>
-                        <h2 className={`text-2xl font-semibold mb-4 text-${C.accent}`}>Panel de Emisión</h2>
+                        <h2 className={`text-2xl font-semibold mb-4 text-${C.accent} flex items-center gap-2`}>
+                            <AppIcons.VibrationalIcon className="w-6 h-6" />
+                            Panel de Emisión
+                        </h2>
                         {emissionPanelItems.length === 0 ? (
                             <p className={`${C.textSecondary} text-base text-center py-4`}>El panel está vacío. Añada fórmulas o tasas.</p>
                         ) : (
@@ -654,7 +659,7 @@ export const App: React.FC = () => {
                                 </>
                                 )}
                             </AnimatePresence>
-                            <AppIcons.BroadcastIcon className={`w-12 h-12 text-${isBroadcasting ? C.accent : C.textSecondary} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-300`} />
+                            <AppIcons.TransmissionIcon className={`w-12 h-12 text-${isBroadcasting ? C.accent : C.textSecondary} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-300`} />
                         </div>
 
                         <div className="w-full max-w-xs flex flex-col items-center">
@@ -688,7 +693,10 @@ export const App: React.FC = () => {
                 {/* Right Panel: Session Log */}
                 <section className={`lg:col-span-1 bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-${C.accent}/20`}>
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className={`text-2xl font-semibold text-${C.accent}`}>Registro de Sesión</h2>
+                        <h2 className={`text-2xl font-semibold text-${C.accent} flex items-center gap-2`}>
+                            <AppIcons.DocumentIcon className="w-6 h-6" />
+                            Registro de Sesión
+                        </h2>
                         <button
                             onClick={handleClearSessionLog}
                             className={`text-sm ${C.textSecondary} hover:text-red-400 transition-colors p-1`}
