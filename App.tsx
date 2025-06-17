@@ -667,7 +667,7 @@ export const App: React.FC = () => {
 
                 {/* Center Panel: Emission Panel & Controls */}
                 <section className="lg:col-span-1 space-y-6">
-                    <div className={`bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-${C.accent}/20 relative overflow-hidden`}>
+                    <div className={`bg-gray-800/50 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-${C.accent}/20 relative overflow-hidden min-h-[500px]`}>
                         {/* Decorative Elements - Top Infinity Symbols */}
                         <AnimatePresence>
                             {isBroadcasting && (
