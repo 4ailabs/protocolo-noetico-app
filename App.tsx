@@ -641,15 +641,127 @@ export const App: React.FC = () => {
 
                 {/* Center Panel: Emission Panel & Controls */}
                 <section className="lg:col-span-1 space-y-6">
-                    <div className={`bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-${C.accent}/20`}>
-                        <h2 className={`text-2xl font-semibold mb-4 text-${C.accent} flex items-center gap-2`}>
+                    <div className={`bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-${C.accent}/20 relative overflow-hidden`}>
+                        {/* Decorative Elements - Top Infinity Symbols */}
+                        <AnimatePresence>
+                            {isBroadcasting && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 0.3, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="absolute top-2 left-0 right-0 flex justify-center gap-8 pointer-events-none"
+                                >
+                                    {[...Array(4)].map((_, i) => (
+                                        <motion.svg
+                                            key={`top-${i}`}
+                                            width="24"
+                                            height="16"
+                                            viewBox="0 0 24 16"
+                                            className={`text-${C.accent}`}
+                                            animate={{ 
+                                                rotate: [0, 360],
+                                                scale: [1, 1.1, 1]
+                                            }}
+                                            transition={{ 
+                                                duration: 8 + i * 2, 
+                                                repeat: Infinity, 
+                                                ease: "linear",
+                                                delay: i * 0.5
+                                            }}
+                                        >
+                                            <path
+                                                d="M12 2C8 2 6 6 6 8s2 6 6 6 6-4 6-6-2-6-6-6zm0 0C16 2 18 6 18 8s-2 6-6 6-6-4-6-6 2-6 6-6z"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </motion.svg>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Decorative Elements - Center Lines */}
+                        <AnimatePresence>
+                            {isBroadcasting && (
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 0.4, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                                >
+                                    {[...Array(4)].map((_, i) => (
+                                        <motion.div
+                                            key={`line-${i}`}
+                                            className={`h-0.5 bg-${C.accent} mb-2 rounded-full`}
+                                            style={{ width: `${140 - i * 20}px` }}
+                                            animate={{ 
+                                                opacity: [0.2, 0.6, 0.2],
+                                                scaleX: [0.8, 1.2, 0.8]
+                                            }}
+                                            transition={{ 
+                                                duration: 3, 
+                                                repeat: Infinity, 
+                                                delay: i * 0.3,
+                                                ease: "easeInOut"
+                                            }}
+                                        />
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Decorative Elements - Bottom Infinity Symbols */}
+                        <AnimatePresence>
+                            {isBroadcasting && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 0.3, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    className="absolute bottom-2 left-0 right-0 flex justify-center gap-8 pointer-events-none"
+                                >
+                                    {[...Array(4)].map((_, i) => (
+                                        <motion.svg
+                                            key={`bottom-${i}`}
+                                            width="24"
+                                            height="16"
+                                            viewBox="0 0 24 16"
+                                            className={`text-${C.accent}`}
+                                            animate={{ 
+                                                rotate: [360, 0],
+                                                scale: [1, 1.1, 1]
+                                            }}
+                                            transition={{ 
+                                                duration: 8 + i * 2, 
+                                                repeat: Infinity, 
+                                                ease: "linear",
+                                                delay: i * 0.5
+                                            }}
+                                        >
+                                            <path
+                                                d="M12 2C8 2 6 6 6 8s2 6 6 6 6-4 6-6-2-6-6-6zm0 0C16 2 18 6 18 8s-2 6-6 6-6-4-6-6 2-6 6-6z"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </motion.svg>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <h2 className={`text-2xl font-semibold mb-4 text-${C.accent} flex items-center gap-2 relative z-10`}>
                             <AppIcons.VibrationalIcon className="w-6 h-6" />
                             Panel de Emisión
                         </h2>
                         {emissionPanelItems.length === 0 ? (
-                            <p className={`${C.textSecondary} text-base text-center py-4`}>El panel está vacío. Añada fórmulas o tasas.</p>
+                            <p className={`${C.textSecondary} text-base text-center py-4 relative z-10`}>El panel está vacío. Añada fórmulas o tasas.</p>
                         ) : (
-                            <div className="space-y-4 max-h-[calc(100vh-450px)] md:max-h-[calc(100vh-420px)] overflow-y-auto pr-1 mb-4">
+                            <div className="space-y-4 max-h-[calc(100vh-450px)] md:max-h-[calc(100vh-420px)] overflow-y-auto pr-1 mb-4 relative z-10">
                                 {emissionPanelItems.map(item => (
                                     <EmissionItem 
                                         key={item.id} 
