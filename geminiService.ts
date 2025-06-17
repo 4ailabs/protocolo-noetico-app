@@ -1,13 +1,11 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { NoeticFormulaData } from "./types";
 
-// Ensure process.env.API_KEY is available in the execution context.
-const apiKey = typeof process !== 'undefined' && process.env && process.env.API_KEY
-  ? process.env.API_KEY
-  : undefined;
+// Get the Gemini API key from environment variables
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!apiKey) {
-  console.error("API_KEY for Gemini is not defined. Please ensure process.env.API_KEY is set.");
+  console.error("VITE_GEMINI_API_KEY for Gemini is not defined. Please ensure the environment variable is set.");
   // Fallback to prevent immediate crash if key is missing, API calls will fail.
 }
 
