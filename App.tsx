@@ -12,6 +12,7 @@ import { getActivatingBeliefsForFlower, hasActivatingBeliefs } from "./activatin
 export const App: React.FC = () => {
     const C = appConfig.colors;
 
+    const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [activeTab, setActiveTab] = useState<"beliefs" | "flowers">("beliefs");
     const [isWizardOpen, setIsWizardOpen] = useState(false);
     const [currentStep, setCurrentStep] = useState(0); // 0: Closed/Start, 1: Group, 2: Flower, 3: Belief, 4: Antidote
@@ -61,10 +62,17 @@ export const App: React.FC = () => {
 
     useEffect(() => {
         logEvent("Herramienta Nivel 2 iniciada. Lista para la sesión.");
+        
+        // Actualizar fecha y hora cada segundo
+        const dateTimeInterval = setInterval(() => {
+            setCurrentDateTime(new Date());
+        }, 1000);
+        
         return () => {
             if (timerIntervalRef.current) {
                 clearInterval(timerIntervalRef.current);
             }
+            clearInterval(dateTimeInterval);
         };
     }, [logEvent]);
     
@@ -552,6 +560,33 @@ export const App: React.FC = () => {
                 <h1 className={`text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${C.accentGradientFrom} ${C.accentGradientTo}`}>{appConfig.mainTitle}</h1>
                 <p className={`${C.textSecondary} text-base mt-1`}>{appConfig.subtitle}</p>
                 <p className={`${C.textSecondary} text-sm mt-2`}>Por: {appConfig.author}</p>
+                
+                {/* Fecha y Hora */}
+                <div className={`mt-4 p-3 bg-gray-800/30 rounded-lg border border-${C.accent}/20 inline-block`}>
+                    <div className="flex items-center justify-center gap-4 text-sm">
+                        <div className="flex items-center gap-1">
+                            <AppIcons.CalendarIcon className="w-4 h-4" />
+                            <span className={`${C.textSecondary}`}>
+                                {currentDateTime.toLocaleDateString('es-ES', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                })}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <AppIcons.ClockIcon className="w-4 h-4" />
+                            <span className={`text-${C.accent} font-mono`}>
+                                {currentDateTime.toLocaleTimeString('es-ES', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit', 
+                                    second: '2-digit' 
+                                })}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             {/* Subject Info */}
