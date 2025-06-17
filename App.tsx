@@ -6,6 +6,7 @@ import ListItem from "./components/ListItem";
 import EmissionItem from "./components/EmissionItem";
 import { AppIcons } from "./components/icons";
 import { suggestAntidotes, generateAffirmation } from "./geminiService";
+import { playStartSound, playEndSound, initializeAudioContext } from "./audioUtils";
 
 export const App: React.FC = () => {
     const C = appConfig.colors;
@@ -284,7 +285,15 @@ export const App: React.FC = () => {
                  clearInterval(timerIntervalRef.current);
                  timerIntervalRef.current = null;
                  setIsBroadcasting(false);
-                 logEvent("Temporizador finalizado. Transmisión detenida automáticamente.");
+                 
+                 // Reproducir sonido de finalización automática
+                 try {
+                     playEndSound();
+                     logEvent("Temporizador finalizado. Transmisión detenida automáticamente. Sonido de finalización reproducido.");
+                 } catch (error) {
+                     console.warn("Error al reproducir sonido de finalización automática:", error);
+                     logEvent("Temporizador finalizado. Transmisión detenida automáticamente. Error al reproducir sonido de finalización.");
+                 }
             }
         } else { 
             const hours = Math.floor(elapsed / 3600);
@@ -295,11 +304,21 @@ export const App: React.FC = () => {
         setTimerDisplay(timeString);
     }, [logEvent]);
 
-    const handleStartBroadcast = () => {
+    const handleStartBroadcast = async () => {
         if (isBroadcasting) return;
         if (emissionPanelItems.length === 0) {
             alert("Añada al menos un ítem al panel de emisión antes de transmitir.");
             return;
+        }
+
+        // Inicializar contexto de audio y reproducir sonido de inicio
+        try {
+            await initializeAudioContext();
+            playStartSound();
+            logEvent("Sonido de inicio reproducido.");
+        } catch (error) {
+            console.warn("Error al reproducir sonido de inicio:", error);
+            logEvent("Error al reproducir sonido de inicio.");
         }
 
         setIsBroadcasting(true);
@@ -331,7 +350,15 @@ export const App: React.FC = () => {
             clearInterval(timerIntervalRef.current);
             timerIntervalRef.current = null;
         }
-        logEvent("Transmisión detenida manually.");
+        
+        // Reproducir sonido de finalización
+        try {
+            playEndSound();
+            logEvent("Transmisión detenida manualmente. Sonido de finalización reproducido.");
+        } catch (error) {
+            console.warn("Error al reproducir sonido de finalización:", error);
+            logEvent("Transmisión detenida manualmente. Error al reproducir sonido de finalización.");
+        }
     };
 
     const handleClearSessionLog = () => {
